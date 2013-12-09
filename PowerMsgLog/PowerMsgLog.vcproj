@@ -135,6 +135,7 @@
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_CONSOLE;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE"
 				MinimalRebuild="true"
 				RuntimeLibrary="1"
+				BufferSecurityCheck="false"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -156,6 +157,7 @@
 				AdditionalOptions=" /subsystem:windowsce,4.20"
 				OutputFile="$(OutDir)/PowerMsgLog.exe"
 				LinkIncremental="2"
+				IgnoreDefaultLibraryNames="secchk.lib"
 				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/PowerMsgLog.pdb"
@@ -186,7 +188,7 @@
 			/>
 			<DeploymentTool
 				ForceDirty="-1"
-				RemoteDirectory=""
+				RemoteDirectory="\"
 				RegisterOutput="0"
 				AdditionalFiles=""
 			/>
