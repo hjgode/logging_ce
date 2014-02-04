@@ -22,4 +22,7 @@ connMgrLog
   currently the messages are shown on-screen only
   TODO: log messages to file
   
+keyLoggerCE
+  logs hardware keyboard strokes (no software input panel inputs!) but with record of window and special keys.
+  
   
