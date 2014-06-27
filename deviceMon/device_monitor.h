@@ -10,7 +10,7 @@
 #include <ceconfig.h>
 #include <storemgr.h>
 
-#include "cedrv_guid.h"
+#include "ce600/cedrv_guid.h"
 
 extern BOOL StopMonitoringForNewDisks;
 
