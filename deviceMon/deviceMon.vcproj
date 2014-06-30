@@ -95,7 +95,7 @@
 			/>
 			<DeploymentTool
 				ForceDirty="-1"
-				RemoteDirectory=""
+				RemoteDirectory="\"
 				RegisterOutput="0"
 				AdditionalFiles=""
 			/>
@@ -208,6 +208,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\iclass_info.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -239,6 +243,10 @@
 			</File>
 			<File
 				RelativePath=".\deviceMon.h"
+				>
+			</File>
+			<File
+				RelativePath=".\iclass_info.h"
 				>
 			</File>
 			<File

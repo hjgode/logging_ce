@@ -11,6 +11,9 @@
 HINSTANCE			g_hInst;			// current instance
 HWND				g_hWndMenuBar;		// menu bar handle
 
+HWND				g_hWndEdit;
+TCHAR				szTemp[32000];
+
 // Forward declarations of functions included in this code module:
 ATOM			MyRegisterClass(HINSTANCE, LPTSTR);
 BOOL			InitInstance(HINSTANCE, int);
@@ -157,6 +160,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     int wmId, wmEvent;
     PAINTSTRUCT ps;
     HDC hdc;
+	RECT rect;
+	int tLen=0;
+	TCHAR pnpText[MAX_PATH];
+	static TCHAR szTemp2[32000];
 
     static SHACTIVATEINFO s_sai;
 	
@@ -199,7 +206,43 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             // Initialize the shell activate info structure
             memset(&s_sai, 0, sizeof (s_sai));
             s_sai.cbSize = sizeof (s_sai);
+			
+			GetClientRect(hWnd, &rect);
+			g_hWndEdit = CreateWindow(L"EDIT", 
+				L"",
+				WS_CHILD|WS_VISIBLE|ES_MULTILINE|ES_AUTOVSCROLL|ES_WANTRETURN|WS_VSCROLL|WS_HSCROLL|ES_READONLY, //|ES_AUTOHSCROLL
+				rect.left,
+				rect.top,
+				rect.right,
+				rect.bottom,
+				hWnd,
+				NULL, //(HMENU)IDC_MAIN_EDIT,
+				GetModuleHandle(NULL),
+				NULL);
+			if(g_hWndEdit)
+				SendMessage(g_hWndEdit,WM_SETTEXT,NULL,(LPARAM)L"Insert text here..."); 
+			else
+				DEBUGMSG(1, (L"CreateWindow() failed!\n"));
+
+			startMonitor(hWnd);
             break;
+		case WM_PNPUPDATE:
+			//
+			wsprintf(pnpText, L"%s", (TCHAR*)wParam);
+			DEBUGMSG(1, (L"WM_PNPUPDATE: %s\n", pnpText));
+
+			wsprintf(szTemp2, L"");
+			tLen = GetWindowTextLength(g_hWndEdit);
+			if(wcslen(pnpText)+tLen+4 > 32000)
+				SetWindowText(g_hWndEdit, pnpText);
+			else{
+				GetWindowText(g_hWndEdit, szTemp, 32000);
+				wsprintf(szTemp2, L"%s\r\n%s", szTemp, pnpText);
+				SetWindowText(g_hWndEdit, szTemp2);
+			}
+			UpdateWindow(g_hWndEdit);
+
+			break;
         case WM_PAINT:
             hdc = BeginPaint(hWnd, &ps);
             
@@ -208,6 +251,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             EndPaint(hWnd, &ps);
             break;
         case WM_DESTROY:
+			stopMonitor();
             CommandBar_Destroy(g_hWndMenuBar);
             PostQuitMessage(0);
             break;
