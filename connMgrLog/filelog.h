@@ -2,9 +2,12 @@
 
 #ifndef NCLOG_INCLUDED
 #define NCLOG_INCLUDED
-extern void filelog (const wchar_t *fmt, ...);
+
+int initFileNames(void);
+
+void filelog (const wchar_t *fmt, ...);
 //extern bool set_nclog_port(unsigned short x) { return wsa_bind(x); }
-extern TCHAR* logDateTime();
+TCHAR* logDateTime();
 
 /*
 usage:

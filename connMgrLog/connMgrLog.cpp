@@ -145,7 +145,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
         MoveWindow(hWnd, rc.left, rc.top, rc.right-rc.left, rc.bottom-rc.top, FALSE);
     }
 
-    ShowWindow(hWnd, nCmdShow);
+    ShowWindow(hWnd, SW_MINIMIZE);// nCmdShow);
     UpdateWindow(hWnd);
 
 
@@ -172,6 +172,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     static SHACTIVATEINFO s_sai;
 	if(WM_CM_STATUS_CHANGE==message){
 		DEBUGMSG(1, (L"got conn mgr status msg: wP=0x%02x, lP=%i, '%s'\n", wParam, lParam, getConnStatusText(wParam)));
+		
+		filelog(L"conn mgr status msg: wP=0x%02x, lP=%i, '%s'\n", wParam, lParam, getConnStatusText(wParam));
+
 		dumpConnections(g_hWndEdit);
 		//TCHAR txt[MAX_PATH];
 		//wsprintf(txt, L"got conn mgr status msg: wP=%i, lP=%i\n", wParam, lParam);
@@ -234,10 +237,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			else
 				DEBUGMSG(1, (L"CreateWindow() failed!\n"));
 
-			dumpConnections(g_hWndEdit);
-			startConnMgrWatch(g_hWndEdit);
+			initFileNames();
+			filelog(L"connMgrLog started\n");
 
-			hTimedThread = CreateThread(NULL, 0, timedThread, NULL, 0, &dwThreadID);
+			dumpConnections(g_hWndEdit);
+
+			startConnMgrWatch(hWnd);// (g_hWndEdit);
+
+			//hTimedThread = CreateThread(NULL, 0, timedThread, NULL, 0, &dwThreadID);
 
             break;
         case WM_PAINT:

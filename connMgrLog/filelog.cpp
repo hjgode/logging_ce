@@ -13,19 +13,7 @@ static char		logFileName[MAX_PATH];
 static TCHAR	logFileNameW[MAX_PATH];
 static BOOL		bFirstFileCall = true;
 
-//========================== start of file stuff =============================
-static int initFileNames()
-{
-	 // Get name of executable
-	TCHAR lpFileName1[MAX_PATH+1];
-	GetModuleFileName(NULL, lpFileName1, MAX_PATH); //lpFileName will contain the exe name of this running app!
-
-	//add txt extension
-	TCHAR txtFileName[MAX_PATH+1];
-	wsprintf(txtFileName, L"%s.log.txt", lpFileName1);
-	//store the filename to use in char and tchar
-	TCHAR logFileNameW[MAX_PATH];
-
+void checkFileSize(TCHAR* txtFileName){
 	//#### we maintain two log files, an actual and a bak one
 	//get file size
 	HANDLE hFile = CreateFile(txtFileName, 
@@ -49,10 +37,24 @@ static int initFileNames()
 			MoveFile(txtFileName, txtFileNameBAK);
 		}
 	}
-
 	//copy filename to global char and tchar var
 	wsprintf(logFileNameW, txtFileName);
 	wcstombs(logFileName, logFileNameW, sizeof(logFileNameW)*sizeof(logFileNameW[0]));
+
+}
+
+//========================== start of file stuff =============================
+int initFileNames()
+{
+	 // Get name of executable
+	TCHAR lpFileName1[MAX_PATH+1];
+	GetModuleFileName(NULL, lpFileName1, MAX_PATH); //lpFileName will contain the exe name of this running app!
+
+	//add txt extension
+	TCHAR txtFileName[MAX_PATH+1];
+	wsprintf(txtFileName, L"%s.log.txt", lpFileName1);
+
+	checkFileSize(txtFileName);
 
 	FILE	*fp;
 	fp = fopen(logFileName, "a+");
@@ -71,7 +73,7 @@ TCHAR* logDateTime(){
 	res = GetTimeFormat(LOCALE_SYSTEM_DEFAULT,
 							TIME_FORCE24HOURFORMAT,
 							NULL,
-							L"hh:mm:ss",
+							L"hhmmss", //L"hh:mm:ss",
 							lpTimeStr,
 							sizeof (lpTimeStr ) * sizeof(TCHAR));
 	if (res == 0)
@@ -83,7 +85,7 @@ TCHAR* logDateTime(){
 	res = GetDateFormat(  LOCALE_SYSTEM_DEFAULT,
 						  NULL,
 						  NULL,
-						  L"dd.MM.yyyy",
+						  L"yyyyMMdd",// L"dd.MM.yyyy",
 						  lpDateStr,
 						  sizeof (lpDateStr) * sizeof(TCHAR));
 	if (res == 0)
@@ -91,7 +93,7 @@ TCHAR* logDateTime(){
 		wcscpy(lpDateStr, L"err");
 	}
 
-	wsprintf(str, L"Date and Time: %s %s", lpDateStr, lpTimeStr);
+	wsprintf(str, L"%s %s: ", lpDateStr, lpTimeStr);
 	return str;
 }
 
@@ -101,7 +103,7 @@ static int writefile(TCHAR *filetext){
 	TCHAR  szTemp[255];
 	char  szTempA[255];
 
-	wsprintf(szTemp, L"%s", filetext);
+	wsprintf(szTemp, L"%s%s", logDateTime(), filetext);
 	wcstombs(szTempA, szTemp, sizeof(szTemp)/sizeof(TCHAR));
 
 	if (bFirstFileCall){

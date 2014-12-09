@@ -1,6 +1,8 @@
 //connMgr.cpp helper functions
 
-#include <windows.h>
+//#include <windows.h>
+#include "stdafx.h"
+
 #include "connMgr.h"
 
 	#define INIT_GUID
@@ -71,18 +73,6 @@ void dump_ipaddr(CONNMGR_CONNECTION_IPADDR*ip)
     }
 }
 
-void addText(HWND hEdit, TCHAR* text){
-//	HWND hEdit = GetDlgItem(hWndMain, IDC_EDIT1);
-	TCHAR textOld[32000];
-	TCHAR textNew[32000];
-	int iCount = GetWindowText(hEdit, textOld, 32000);
-	if(iCount>0)
-		wsprintf(textNew, L"%s\r\r\n%s\r\r\n", textOld, text);
-	else
-		wsprintf(textNew, L"%s\r\r\n", text);
-	SetWindowText(hEdit, textNew);
-}
-
 void dumpGUID(GUID* pGuidIn){
 	TCHAR strOut[80];
 	memset(strOut,0,80 * sizeof(TCHAR));
@@ -120,16 +110,16 @@ TCHAR* szConnSubtype[] = {
 	L"CM_CONNSUBTYPE_CELLULAR_PTT",
 };
 void dump_details_params(CONNMGR_CONNECTION_DETAILED_STATUS *p){
-	//DEBUGMSG(1, (L"\r\n############################################\r\n"));
-	logMsg(L"\r\n############################################\r\n");
+	//DEBUGMSG(1, (L"\n############################################\n"));
+	logMsg(L"\n############################################\n");
 	//check which flags are valid and dump them
 	if(p->dwParams & CONNMGRDETAILEDSTATUS_PARAM_TYPE){			//The dwType member of CONNMGR_CONNECTION_DETAILED_STATUS is valid
-		//DEBUGMSG(1,(L"\tConnType= '%s'\r\n", szConnType[p->dwType]));
-		logMsg(L"\tConnType= '%s'\r\n", szConnType[p->dwType]);
+		//DEBUGMSG(1,(L"\tConnType= '%s'\n", szConnType[p->dwType]));
+		logMsg(L"\tConnType= '%s'\n", szConnType[p->dwType]);
 	}
 	if(p->dwParams & CONNMGRDETAILEDSTATUS_PARAM_SUBTYPE){		//dwSubtype member of CONNMGR_CONNECTION_DETAILED_STATUS is valid
-		//DEBUGMSG(1,(L"\tConnSubtype= '%s'\r\n", szConnSubtype[p->dwSubtype]));
-		logMsg(L"\tConnSubtype= '%s'\r\n", szConnSubtype[p->dwSubtype]);
+		//DEBUGMSG(1,(L"\tConnSubtype= '%s'\n", szConnSubtype[p->dwSubtype]));
+		logMsg(L"\tConnSubtype= '%s'\n", szConnSubtype[p->dwSubtype]);
 		switch(p->dwSubtype){
 			case CM_CONNSUBTYPE_UNKNOWN:
 				break;
@@ -137,56 +127,56 @@ void dump_details_params(CONNMGR_CONNECTION_DETAILED_STATUS *p){
 	}
 	if(p->dwFlags & CONNMGRDETAILEDSTATUS_PARAM_FLAGS){
 		if(p->dwFlags && CM_DSF_BILLBYTIME){
-			//DEBUGMSG(1, (L"\t cm_flags+=CM_DSF_BILLBYTIME\r\n"));
-			logMsg(L"\t cm_flags+=CM_DSF_BILLBYTIME\r\n");
+			//DEBUGMSG(1, (L"\t cm_flags+=CM_DSF_BILLBYTIME\n"));
+			logMsg(L"\t cm_flags+=CM_DSF_BILLBYTIME\n");
 		}
 		if(p->dwFlags && CM_DSF_ALWAYSON){
-			//DEBUGMSG(1, (L"\t cm_flags+=CM_DSF_ALWAYSON\r\n"));
-			logMsg(L"\t cm_flags+=CM_DSF_ALWAYSON\r\n");
+			//DEBUGMSG(1, (L"\t cm_flags+=CM_DSF_ALWAYSON\n"));
+			logMsg(L"\t cm_flags+=CM_DSF_ALWAYSON\n");
 		}
 		if(p->dwFlags && CM_DSF_SUSPENDRESUME){
-			//DEBUGMSG(1, (L"\t cm_flags+=CM_DSF_SUSPENDRESUME\r\n"));
-			logMsg(L"\t cm_flags+=CM_DSF_SUSPENDRESUME\r\n");
+			//DEBUGMSG(1, (L"\t cm_flags+=CM_DSF_SUSPENDRESUME\n"));
+			logMsg(L"\t cm_flags+=CM_DSF_SUSPENDRESUME\n");
 		}
 
 	}
 	if(p->dwParams & CONNMGRDETAILEDSTATUS_PARAM_SECURE){
-		//DEBUGMSG(1, (L"\tsecurity level: %i\r\n", p->dwSecure));
-		logMsg(L"\tsecurity level: %i\r\n", p->dwSecure);
+		//DEBUGMSG(1, (L"\tsecurity level: %i\n", p->dwSecure));
+		logMsg(L"\tsecurity level: %i\n", p->dwSecure);
 	}
 	if(p->dwParams && CONNMGRDETAILEDSTATUS_PARAM_DESTNET){
 		//DEBUGMSG(1, (L"\tdest guid: "));
 		logMsg(L"\tdest guid: ");
 		dumpGUID( &p->guidDestNet );
-		//DEBUGMSG(1, (L"\r\n"));
-		logMsg(L"\r\n");
+		//DEBUGMSG(1, (L"\n"));
+		logMsg(L"\n");
 	}
 	if(p->dwParams & CONNMGRDETAILEDSTATUS_PARAM_SOURCENET){
 		//DEBUGMSG(1, (L"\tsource guid: "));
 		logMsg(L"\tsource guid: ");
 		dumpGUID( &p->guidSourceNet );
-		//DEBUGMSG(1, (L"\r\n"));
-		logMsg(L"\r\n");
+		//DEBUGMSG(1, (L"\n"));
+		logMsg(L"\n");
 	}
 	if(p->dwParams & CONNMGRDETAILEDSTATUS_PARAM_DESCRIPTION){
-		//DEBUGMSG(1, (L"\tdescription: '%s'\r\n", p->szDescription));
-		logMsg(L"\tdescription: '%s'\r\n", p->szDescription);
+		//DEBUGMSG(1, (L"\tdescription: '%s'\n", p->szDescription));
+		logMsg(L"\tdescription: '%s'\n", p->szDescription);
 	}
 	if(p->dwParams & CONNMGRDETAILEDSTATUS_PARAM_ADAPTERNAME){
-		//DEBUGMSG(1, (L"\tadapter: '%s'\r\n", p->szAdapterName));
-		logMsg(L"\tadapter: '%s'\r\n", p->szAdapterName);
+		//DEBUGMSG(1, (L"\tadapter: '%s'\n", p->szAdapterName));
+		logMsg(L"\tadapter: '%s'\n", p->szAdapterName);
 	}
 	if(p->dwParams & CONNMGRDETAILEDSTATUS_PARAM_CONNSTATUS){
-		//DEBUGMSG(1, (L"\tconn state: %i='%s'\r\n", p->dwConnectionStatus, connectionStates[p->dwConnectionStatus]));
-		logMsg(L"\tconn state: %i='%s'\r\n", p->dwConnectionStatus, connectionStates[p->dwConnectionStatus]);
+		//DEBUGMSG(1, (L"\tconn state: %i='%s'\n", p->dwConnectionStatus, connectionStates[p->dwConnectionStatus]));
+		logMsg(L"\tconn state: %i='%s'\n", p->dwConnectionStatus, connectionStates[p->dwConnectionStatus]);
 	}
 	if(p->dwParams && CONNMGRDETAILEDSTATUS_PARAM_LASTCONNECT){
-		//DEBUGMSG(1, (L"\tlast connect: %04d-%02d-%02d(%d) %02d:%02d:%02d.%03d\r\n",
+		//DEBUGMSG(1, (L"\tlast connect: %04d-%02d-%02d(%d) %02d:%02d:%02d.%03d\n",
 				//p->LastConnectTime.wYear, p->LastConnectTime.wMonth, p->LastConnectTime.wDay,
 				//p->LastConnectTime.wDayOfWeek,
 				//p->LastConnectTime.wHour, p->LastConnectTime.wMinute, p->LastConnectTime.wSecond,
 				//p->LastConnectTime.wMilliseconds));
-		logMsg(L"\tlast connect: %04d-%02d-%02d(%d) %02d:%02d:%02d.%03d\r\n",
+		logMsg(L"\tlast connect: %04d-%02d-%02d(%d) %02d:%02d:%02d.%03d\n",
 				p->LastConnectTime.wYear, p->LastConnectTime.wMonth, p->LastConnectTime.wDay,
 				p->LastConnectTime.wDayOfWeek,
 				p->LastConnectTime.wHour, p->LastConnectTime.wMinute, p->LastConnectTime.wSecond,
@@ -194,15 +184,15 @@ void dump_details_params(CONNMGR_CONNECTION_DETAILED_STATUS *p){
 
 	}
 	if(p->dwParams & CONNMGRDETAILEDSTATUS_PARAM_SIGNALQUALITY){
-		//DEBUGMSG(1, (L"\tsignal: %i\r\n", p->dwSignalQuality));
-		logMsg(L"\tsignal: %i\r\n", p->dwSignalQuality);
+		//DEBUGMSG(1, (L"\tsignal: %i\n", p->dwSignalQuality));
+		logMsg(L"\tsignal: %i\n", p->dwSignalQuality);
 	}
 	if(p->dwParams & CONNMGRDETAILEDSTATUS_PARAM_IPADDR ){
 		dump_ipaddr(p->pIPAddr);
 	}
 	else{
-		//DEBUGMSG(1, (L"\tno IP\r\n"));
-		logMsg(L"\tno IP\r\n");
+		//DEBUGMSG(1, (L"\tno IP\n"));
+		logMsg(L"\tno IP\n");
 	}
 }
 
@@ -210,32 +200,32 @@ void dump_details(CONNMGR_CONNECTION_DETAILED_STATUS *p)
 {
 	dump_details_params(p);
 	return;
-	TCHAR txt[MAX_PATH];
+//	TCHAR txt[MAX_PATH];
 	if (p->szAdapterName && wcslen(p->szAdapterName)>0){
-        //DEBUGMSG(1,(L"adap: %s\r\n", p->szAdapterName));
-		logMsg(L"adap: %s\r\n", p->szAdapterName);
-		//wsprintf(txt, L"adap: %s\r\n", p->szAdapterName);
+        //DEBUGMSG(1,(L"adap: %s\n", p->szAdapterName));
+		logMsg(L"adap: %s\n", p->szAdapterName);
+		//wsprintf(txt, L"adap: %s\n", p->szAdapterName);
 		//addText(hWndMain, txt);
 	}
 	if (p->szDescription){
-        //DEBUGMSG(1, (L"desc: %s\r\n", p->szDescription));
-		logMsg(L"desc: %s\r\n", p->szDescription);
-		//wsprintf(txt, L"desc: %s\r\n", p->szDescription);
+        //DEBUGMSG(1, (L"desc: %s\n", p->szDescription));
+		logMsg(L"desc: %s\n", p->szDescription);
+		//wsprintf(txt, L"desc: %s\n", p->szDescription);
 		//addText(hWndMain, txt);
 	}
 
-    //DEBUGMSG(1, (L"\version=%08lx params=%08lx t=%08lx s=%08lx f=%08lx sec=%08lx stat=%08lx q=%08lx\r\n",
+    //DEBUGMSG(1, (L"\version=%08lx params=%08lx t=%08lx s=%08lx f=%08lx sec=%08lx stat=%08lx q=%08lx\n",
         //p->dwVer, p->dwParams, p->dwType, p->dwSubtype, p->dwFlags, p->dwSecure, p->dwConnectionStatus, p->dwSignalQuality));
-	logMsg(L"\version=%08lx params=%08lx t=%08lx s=%08lx f=%08lx sec=%08lx stat=%08lx q=%08lx\r\n",
+	logMsg(L"\version=%08lx params=%08lx t=%08lx s=%08lx f=%08lx sec=%08lx stat=%08lx q=%08lx\n",
         p->dwVer, p->dwParams, p->dwType, p->dwSubtype, p->dwFlags, p->dwSecure, p->dwConnectionStatus, p->dwSignalQuality);
-    //debug(L"dst=%s\r\n", GuidToString(&p->guidDestNet).c_str());
-    //debug(L"src=%s\r\n", GuidToString(&p->guidSourceNet).c_str());
-    //DEBUGMSG(1, (L"\tlast: %04d-%02d-%02d(%d) %02d:%02d:%02d.%03d\r\n",
+    //debug(L"dst=%s\n", GuidToString(&p->guidDestNet).c_str());
+    //debug(L"src=%s\n", GuidToString(&p->guidSourceNet).c_str());
+    //DEBUGMSG(1, (L"\tlast: %04d-%02d-%02d(%d) %02d:%02d:%02d.%03d\n",
             //p->LastConnectTime.wYear, p->LastConnectTime.wMonth, p->LastConnectTime.wDay,
             //p->LastConnectTime.wDayOfWeek,
             //p->LastConnectTime.wHour, p->LastConnectTime.wMinute, p->LastConnectTime.wSecond,
             //p->LastConnectTime.wMilliseconds));
-	logMsg(L"\tlast: %04d-%02d-%02d(%d) %02d:%02d:%02d.%03d\r\n",
+	logMsg(L"\tlast: %04d-%02d-%02d(%d) %02d:%02d:%02d.%03d\n",
             p->LastConnectTime.wYear, p->LastConnectTime.wMonth, p->LastConnectTime.wDay,
             p->LastConnectTime.wDayOfWeek,
             p->LastConnectTime.wHour, p->LastConnectTime.wMinute, p->LastConnectTime.wSecond,
@@ -261,6 +251,8 @@ void dumpConnections(HWND hWnd){
 			break;
 	}
 	CloseHandle(hConnMgrReady);
+
+	filelog(L"dumpConnections...\n");
 
 	CONNMGR_CONNECTION_DETAILED_STATUS* pStatusBuffer=NULL;
 	DWORD dwBufferSize=0;
@@ -288,12 +280,26 @@ void startConnMgrWatch(HWND hWnd){
 	hEdit=hWnd;
 	if(WM_CM_STATUS_CHANGE==WM_USER+1234){	// do only once, if 1234 then not registered
 		WM_CM_STATUS_CHANGE = RegisterWindowMessage( CONNMGR_STATUS_CHANGE_NOTIFICATION_MSG );
+		if(WM_CM_STATUS_CHANGE==0) //failed
+		{
+			logMsg(L"RegisterWindowMessage failed: %i\n", GetLastError());
+		}
+		else
+			logMsg(L"RegisterWindowMessage OK: id=%08x\n", WM_CM_STATUS_CHANGE);
 		//DEBUGMSG(1, (L"RegisterWindowMessage =0x%x.\r\n", WM_CM_STATUS_CHANGE));
-		logMsg(L"RegisterWindowMessage =0x%x.\r\n", WM_CM_STATUS_CHANGE);
+		//logMsg(L"RegisterWindowMessage =0x%x.\r\n", WM_CM_STATUS_CHANGE);
 	}
 	// after you registered for the CONNMGR_STATUS_CHANGE_NOTIFICATION_MSG and got a constant you can watch for changes
 	hr = ConnMgrRegisterForStatusChangeNotification(TRUE, hWnd);
-	DEBUGMSG(1, (L"ConnMgrRegisterForStatusChangeNotification =0x%x.\r\n", hr));
+	if(hr==S_OK)
+		filelog(L"ConnMgrRegisterForStatusChangeNotification OK\n");
+	else if(hr==E_HANDLE)
+		filelog(L"ConnMgrRegisterForStatusChangeNotification Invalid handle!\n");
+	else if(hr==E_ACCESSDENIED)
+		filelog(L"ConnMgrRegisterForStatusChangeNotification Access denied!\n");
+	else
+		filelog(L"ConnMgrRegisterForStatusChangeNotification Unknown error code: %i!\n", hr);
+
 	return;
 }
 
@@ -305,30 +311,32 @@ void logMsg (const wchar_t *fmt, ...)
         wvsprintf(bufW,fmt,vl);
         char bufOutA[512];
 
+		filelog(L"%s", bufW);
+
 		//convert to char
         WideCharToMultiByte(CP_ACP,0,bufW,-1,bufOutA,400, NULL, NULL);
 
 		if(hEdit){
-			int iLen = SendMessage(hEdit, WM_GETTEXTLENGTH, 0, 0);
+			int iLen = PostMessage(hEdit, WM_GETTEXTLENGTH, 0, 0);
 			iLen+=wcslen(bufW);
 			if(iLen>32000)
 			{
 				//clear text
-				SendMessage(hEdit,WM_SETTEXT,0,0);
+				PostMessage(hEdit,WM_SETTEXT,0,0);
 				iLen=wcslen(bufW);
-				SendMessage(hEdit, WM_SETTEXT, NULL, (LPARAM)bufW);
+				PostMessage(hEdit, WM_SETTEXT, NULL, (LPARAM)bufW);
 			}
 			else{
 				TCHAR* buffer=(TCHAR*)calloc((2+iLen), sizeof(TCHAR));
-				SendMessage(hEdit,WM_GETTEXT, iLen * sizeof(TCHAR), reinterpret_cast<LPARAM>(buffer));
+				PostMessage(hEdit,WM_GETTEXT, iLen * sizeof(TCHAR), reinterpret_cast<LPARAM>(buffer));
 				wcscat(buffer, bufW);
 				//DEBUGMSG(1, (buffer));
 				//addText(hEdit, bufW);
-				SendMessage(hEdit, WM_SETTEXT, NULL, (LPARAM)buffer);
+				PostMessage(hEdit, WM_SETTEXT, NULL, (LPARAM)buffer);
 				free (buffer);
 			}
-			SendMessage(hEdit, EM_SETSEL, 0, MAKELONG(0xffff,0xffff));
-			SendMessage(hEdit, EM_SCROLLCARET, 0,0);
+			PostMessage(hEdit, EM_SETSEL, 0, MAKELONG(0xffff,0xffff));
+			PostMessage(hEdit, EM_SCROLLCARET, 0,0);
 			UpdateWindow(hEdit);
 		}
 
