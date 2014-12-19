@@ -212,6 +212,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\nclog.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -247,6 +251,10 @@
 			</File>
 			<File
 				RelativePath=".\iclass_info.h"
+				>
+			</File>
+			<File
+				RelativePath=".\nclog.h"
 				>
 			</File>
 			<File

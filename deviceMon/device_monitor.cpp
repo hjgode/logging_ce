@@ -23,6 +23,8 @@ StringFromCLSID: {C375C787-B721-4B8E-B67F-A112D5C0A404}:unknown attached
 #include <ole2.h>
 #pragma comment (lib, "ole32.lib")
 
+#include "nclog.h"
+
 BOOL bStopMonitor=FALSE;
 DWORD dwThreadID;
 HANDLE dwThreadHandle;
@@ -116,6 +118,8 @@ In case you follow my suggestion going for CE_DRIVER_SERIAL_PORT_GUID you will n
 					wcsncpy(szText, pDetail->szName, pDetail->cbName );
 					wsprintf(szText2, L"%s %s %s %s", szText, getIClassInfo(szGUID, szInfo), szGUID, pDetail->fAttached?L"attached":L"detached");
 					
+					nclog(L"%s: %s\n", logDateTime(), szText2);
+
 					PostMessage(g_hWndEdit, WM_PNPUPDATE, (WPARAM)szText2, 0);
 
 					//LPOLESTR lplpsz = (LPOLESTR) malloc(80);
@@ -153,20 +157,25 @@ In case you follow my suggestion going for CE_DRIVER_SERIAL_PORT_GUID you will n
 	StopDeviceNotifications(hNotify);
 	CloseMsgQueue(qStore);
 
-	DEBUGMSG(1, (L"montitor ended!\n"));
+	DEBUGMSG(1, (L"monitor ended!\n"));
+	nclog(L"monitor ended!\n");
 	return dwRes;
 }
 
 int startMonitor(HWND hWnd){
+	nclog_LogginEnabled=TRUE;
+	nclog(L"");
 	int iRet=0;
 	bStopMonitor=FALSE;
 	dwThreadHandle = CreateThread(NULL, 0, MonitorDevices, (LPVOID) hWnd, 0, &dwThreadID);
 	if(dwThreadHandle==NULL){
 		iRet=GetLastError();
 		DEBUGMSG(1, (L"startMonitor failed with error=%i\n", iRet));
+		nclog(L"startMonitor failed with error=%i\n", iRet);
 	}
 	else{
 		DEBUGMSG(1, (L"startMonitor OK\n"));
+		nclog(L"startMonitor OK\n");
 	}
 	return iRet;
 }
