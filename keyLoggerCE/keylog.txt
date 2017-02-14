@@ -1,0 +1,13 @@
+
+{14.02.2017 10:48:29}
+###### KeyLoggerCE v0.0.1 started...
+
+Active Window: 'File Explorer'
+[UP][DOWN][RIGHT][LEFT][ESCAPE]
+Active Window: 'Settings'
+852
+{14.02.2017 10:50:58}
+###### KeyLoggerCE v0.0.1 started...
+
+Active Window: 'Desktop'
+789[ESCAPE][BACK]

@@ -58,3 +58,4 @@
 #include <tlhelp32.h>
 #pragma comment (lib , "toolhelp.lib")
 #include "nclog.h"
+#include "childwins.h"

@@ -13,12 +13,19 @@ TCHAR szWindowClass[MAX_PATH];
 
 BOOL bChangeSize=FALSE;
 BOOL bShowFullScreen=TRUE;
+BOOL bModifySize=FALSE;
+BOOL bRDMfull=FALSE;
+
+int iNewWidth=240;
+int iNewHeight=320;
 
 int iShowHide=0;	// 0=do not change, 1=Show, 2=hide
 
 int iEnableDisable=0;	//enable=0-> no change, =1-> enable window, =2->disable window
 
 BOOL bListWindows=FALSE;
+
+//###################################################
 
 struct cmdList{
 	TCHAR value[MAX_PATH];
@@ -54,7 +61,7 @@ void getOptions(struct cmdList *l){
 	liste=l;
 	if(l==NULL)
 		return;
-//	int iVal;
+	int iVal;
 	do{
         DEBUGMSG(1, (L"%s\r\n", liste->value));
 		if(wcsicmp(liste->value, L"-class")==0){		// window class
@@ -70,6 +77,29 @@ void getOptions(struct cmdList *l){
 				DEBUGMSG(1, (L"\t%s\r\n", liste->value));
 				wsprintf(szWindowTitle, L"%s", liste->value);
 			}
+		}
+		else if(wcsicmp(liste->value, L"-resize")==0){		// -resize 240 320
+			bModifySize=TRUE;
+			bChangeSize=TRUE;
+			//read width
+			if(liste->next != NULL){
+				liste=liste->next;
+				DEBUGMSG(1, (L"\t%s\r\n", liste->value));
+				iVal = _wtoi(liste->value);
+				if(iVal!=0)
+					iNewWidth=iVal;
+			}
+			//read height
+			if(liste->next != NULL){
+				liste=liste->next;
+				DEBUGMSG(1, (L"\t%s\r\n", liste->value));
+				iVal = _wtoi(liste->value);
+				if(iVal!=0)
+					iNewHeight=iVal;				
+			}
+		}
+		else if(wcsicmp(liste->value, L"-rdmfull")==0){	// RDM fullscreen?
+			bRDMfull=TRUE;
 		}
 		else if(wcsicmp(liste->value, L"-fullscreen")==0){	// fullscreen?
 			bShowFullScreen=TRUE;
@@ -238,6 +268,10 @@ void printHelp(){
 	nclog(L"-fullscreen				false			make window fullscreen");
 	nclog(L"-maximized				false			make window normal size");
 	nclog(L"");
+	nclog(L"-resize					240 320			change window size to x y, needs two int args");
+	nclog(L"");
+	nclog(L"-rdmfull				false			change RDM to full screen");
+	nclog(L"");
 	nclog(L"-show					no change		make window visible");
 	nclog(L"-hide					no change		make window invisible");
 	nclog(L"");
@@ -264,6 +298,8 @@ void printHelp(){
 
 int _tmain(int argc, _TCHAR* argv[])
 {
+	wsprintf(szWindowClass, L"");
+	wsprintf(szWindowTitle, L"");
 	// -class "IE6on6SoftKeyBar" -enable -list
 	if(argc==1){	// no args
 		nclog(L"showFullScreen utility v 1.0 * %s\n", logDateTime());
@@ -286,45 +322,109 @@ int _tmain(int argc, _TCHAR* argv[])
 	//end of parsing
 
 	if(bListWindows){
-		nclog(L"showFullScreen utility v 1.0 * %s\n", logDateTime());
+		nclog(L"showFullScreen utility v 1.1 * %s\n", logDateTime());
 		
 		ListWindows();
 	}
 
 	//look for window
 	HWND hWnd=NULL;
-	if(wcslen(szWindowClass) && wcslen(szWindowTitle)){
+
+	if(bRDMfull){
+		nclog(L"modifying RDM window\n", logDateTime());
+		//resize RDM window
+		hWnd=FindWindow(L"TSSHELLWND", NULL);
+		long style = GetWindowLong(hWnd, GWL_STYLE);
+		style|=WS_DLGFRAME;
+		style&=~WS_BORDER;
+		SetWindowLong(hWnd, GWL_STYLE, style);
+		int iX = GetSystemMetrics(SM_CXSCREEN);	// 480
+		int iY = GetSystemMetrics(SM_CYSCREEN);	// 640
+		DEBUGMSG(1, (L"fullscreen width/height %i/%i\n", iX, iY));
+		SetWindowPos(hWnd, GetDesktopWindow(), 0, 0, iX, iY, SWP_SHOWWINDOW);
+//		ShowWindow(hWnd, SW_MAXIMIZE);
+		UpdateWindow(hWnd);
+		//modify client win
+		hWnd=getChildWindowByTitle(L"TSSHELLWND", L"WinShell");
+		SetWindowPos(hWnd, GetDesktopWindow(), 0, 0, iX, iY, SWP_SHOWWINDOW);
+		UpdateWindow(hWnd);
+		//move menu bar
+		hWnd=getChildWindowByTitle(L"TSSHELLWND", L"WinShell");
+		if(hWnd!=NULL){
+			HWND hWndMenu = getWindowMenu(hWnd);
+			if(hWndMenu!=NULL){
+				RECT rectMenu;
+				GetWindowRect(hWndMenu, &rectMenu);
+				DWORD dwType=REG_DWORD;
+				DWORD dwBuf;
+				DWORD dwSize=sizeof(DWORD);
+				HKEY hReg;
+				if(RegOpenKeyEx(HKEY_CURRENT_USER, L"ControlPanel\\Sip", 0, KEY_READ, &hReg)==ERROR_SUCCESS){
+					if(RegQueryValueEx(hReg, L"MenuBarHeight", NULL, &dwType, (LPBYTE)&dwBuf, &dwSize)==ERROR_SUCCESS){
+						SetWindowPos(hWndMenu, NULL, rectMenu.top+dwBuf, rectMenu.left, rectMenu.bottom, rectMenu.right, SWP_NOZORDER|SWP_NOSIZE);
+					}
+					RegCloseKey(hReg);
+				}else
+					ShowWindow(hWndMenu, SW_HIDE);
+			}
+		}
+		//modify SIP button
+		hWnd=FindWindow(L"MS_SIPBUTTON",NULL);
+		SetWindowPos(hWnd, GetDesktopWindow(), iX, iY, 0,0,SWP_SHOWWINDOW|SWP_NOSIZE);
+		return 0;
+	}
+
+	if(wcslen(szWindowClass)>0 && wcslen(szWindowTitle)>0){
 		//window title and class
 		hWnd = FindWindow(szWindowClass, szWindowTitle);
+		nclog(L"FindWindow using class and title %s/%s\n", szWindowClass, szWindowTitle);
 	}
-	else if(wcslen(szWindowClass)){
+	else if(wcslen(szWindowClass)>0 && wcslen(szWindowTitle)==0){
 		//only window class, ie "WFIcaClient"
 		hWnd = FindWindow(szWindowClass, NULL);
+		nclog(L"FindWindow using class %s\n", szWindowClass);
 	}
-	else if(wcslen(szWindowTitle)){
+	else if(wcslen(szWindowClass)==0 && wcslen(szWindowTitle)>0){
 		//only window title
 		hWnd = FindWindow(NULL, szWindowTitle);
+		nclog(L"FindWindow using title %s\n", szWindowTitle);
 	}
+
 
 	HWND hWndTaskbar = FindWindow(L"HHTASKBAR", NULL);
 	//sanity restore of HHTASKBAR?
 	//ShowWindow(hWndTaskbar, SW_SHOWNORMAL);
 
-	if(hWnd==NULL)
+	if(hWnd==NULL){
+		nclog(L"No window found!\n");
 		return -1;	//no window found
+	}
 
 	if(bChangeSize){	//change size?
+		nclog(L"Changing Size...\n");
 		RECT rectDesktop;
+		RECT rectTarget;
 		HRESULT hRes = GetWindowRect(GetDesktopWindow(), &rectDesktop);	//desktopwindow is only the taskbar window!
 		// SM_CXFULLSCREEN , SM_CXMAXIMIZED , SM_CXSCREEN 
 		int iCX;
 		int iCY;
 		BOOL bRes;
-		if(bShowFullScreen){
+		if(bShowFullScreen && !bModifySize){
+			nclog(L"..make FullScreen...\n");
 			iCX = GetSystemMetrics(SM_CXSCREEN);	// 480
 			iCY = GetSystemMetrics(SM_CYSCREEN);	// 640
+			DEBUGMSG(1, (L"fullscreen width/height %i/%i\n", iCX, iCY));
 			bRes = SetWindowPos(hWnd, GetDesktopWindow(), 0, 0, iCX, iCY, SWP_SHOWWINDOW);
 			ShowWindow(hWndTaskbar, SW_HIDE);
+			UpdateWindow(hWnd);
+		}
+		else if(bModifySize){
+			nclog(L"..modify size to w/h %i/%i...\n", iNewWidth, iNewHeight);
+			GetWindowRect(hWnd, &rectTarget);
+			bRes = SetWindowPos(hWnd, GetDesktopWindow(), rectTarget.left, rectTarget.top, iNewWidth, iNewHeight, SWP_SHOWWINDOW);
+			if(!bRes)
+				nclog(L"... Changing Size failed: %i\n", GetLastError());
+			ShowWindow(hWnd, SW_SHOWNORMAL);
 		}
 		else{
 			RECT rcMaxScreen;
