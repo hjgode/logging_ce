@@ -23,9 +23,10 @@
 #include <windows.h>
 #include <commctrl.h>
 
-#include <aygshell.h>
-#pragma comment(lib, "aygshell.lib") 
-
+#if defined(WIN32_PLATFORM_PSPC) || defined(WIN32_PLATFORM_WFSP)
+	#include <aygshell.h>
+	#pragma comment(lib, "aygshell.lib") 
+#endif
 
 // Windows Header Files:
 #include <windows.h>
